@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicPulse - Full System Video Walkthrough & Demonstration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-cursor {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-teal-500 selection:text-white">
+
+  <!-- Top Bar -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center font-black text-white shadow-lg shadow-teal-500/20">
+        CP
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-extrabold text-base tracking-tight text-white">CivicPulse Video Walkthrough</h1>
+          <span class="text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded-full flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
+            Simulated Demo Video
+          </span>
+        </div>
+        <p class="text-xs text-slate-400">PDEU CSE Minor Project (2026) • Meet Patel & Aditya Jadeja</p>
+      </div>
+    </div>
+
+    <!-- Quick Navigation Pill Links -->
+    <div class="flex items-center gap-2 text-xs">
+      <a href="http://localhost:3000" target="_blank" class="px-3.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 border border-blue-500/30 font-semibold transition-colors flex items-center gap-1.5">
+        <span>Open Live App (Port 3000)</span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Video Theater Layout -->
+  <main class="max-w-6xl w-full mx-auto px-4 py-6 flex-1 flex flex-col gap-6">
+
+    <!-- Player Screen Container -->
+    <div class="relative bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden flex flex-col">
+      
+      <!-- Video Stage Header -->
+      <div class="bg-slate-900/90 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between text-xs text-slate-400">
+        <div class="flex items-center gap-2 font-medium">
+          <span class="text-slate-500">SCENE <span id="scene-num" class="text-teal-400 font-bold">1</span> / 7:</span>
+          <span id="scene-title" class="text-slate-200 font-semibold">Portal Overview & Real-Time Ingestion</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="playback-time" class="mono text-slate-300 font-medium">00:00 / 02:20</span>
+          <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">1080p HD</span>
+        </div>
+      </div>
+
+      <!-- Video Display Canvas / Mock Screen Viewport -->
+      <div class="relative bg-slate-950 aspect-[16/9] w-full flex items-center justify-center p-4 sm:p-8 overflow-hidden">
+        
+        <!-- Interactive Slide Views (Switched dynamically) -->
+        <div id="video-frame" class="w-full h-full bg-slate-900 rounded-xl border border-slate-800 shadow-inner overflow-hidden relative flex flex-col">
+          <!-- Rendered dynamically by JS -->
+        </div>
+
+        <!-- Simulated Narration Overlay Subtitles -->
+        <div class="absolute bottom-6 left-6 right-6 z-30 pointer-events-none">
+          <div class="max-w-3xl mx-auto bg-slate-950/85 backdrop-blur-md border border-slate-800 p-3.5 rounded-xl shadow-2xl text-center">
+            <span class="text-[10px] uppercase font-bold text-teal-400 tracking-wider block mb-0.5">Presenter Voiceover / Narration</span>
+            <p id="narration-text" class="text-sm font-medium text-slate-100 leading-snug">
+              "Welcome to CivicPulse. Our platform replaces fragmented manual civic reporting with an automated 3-tier municipal portal connecting citizens, administrators, and field staff."
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Video Controls Bar -->
+      <div class="bg-slate-900 border-t border-slate-800 p-4 space-y-3">
+        
+        <!-- Seek Bar -->
+        <div class="relative w-full">
+          <div class="w-full bg-slate-800 h-2 rounded-full cursor-pointer relative overflow-hidden" id="seek-container" onclick="handleSeek(event)">
+            <div id="seek-progress" class="h-full bg-gradient-to-r from-blue-500 to-teal-400 rounded-full transition-all duration-300" style="width: 14%;"></div>
+          </div>
+        </div>
+
+        <!-- Buttons Row -->
+        <div class="flex flex-wrap items-center justify-between gap-4 text-xs">
+          <div class="flex items-center gap-2">
+            <!-- Play / Pause -->
+            <button id="play-btn" onclick="togglePlay()" class="px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold flex items-center gap-1.5 transition-colors shadow-md">
+              <span id="play-icon">▶</span>
+              <span id="play-text">Auto Play</span>
+            </button>
+
+            <!-- Prev / Next Step -->
+            <button onclick="prevScene()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold border border-slate-700 transition-colors">
+              ⏮ Prev Scene
+            </button>
+            <button onclick="nextScene()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold border border-slate-700 transition-colors">
+              Next Scene ⏭
+            </button>
+
+            <!-- Speed selector -->
+            <div class="flex items-center gap-1 bg-slate-800 p-1 rounded-lg border border-slate-700 text-[11px]">
+              <button onclick="setSpeed(1)" id="spd-1" class="px-2 py-0.5 rounded font-bold bg-slate-700 text-teal-300">1x</button>
+              <button onclick="setSpeed(1.5)" id="spd-15" class="px-2 py-0.5 rounded font-bold text-slate-400 hover:text-white">1.5x</button>
+              <button onclick="setSpeed(2)" id="spd-2" class="px-2 py-0.5 rounded font-bold text-slate-400 hover:text-white">2x</button>
+            </div>
+          </div>
+
+          <!-- Chapter Navigation Pills -->
+          <div class="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0">
+            <button onclick="jumpTo(0)" class="chap-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-teal-500/20 text-teal-300 border border-teal-500/40">1. Landing</button>
+            <button onclick="jumpTo(1)" class="chap-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">2. Filing</button>
+            <button onclick="jumpTo(2)" class="chap-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">3. Ingestion</button>
+            <button onclick="jumpTo(3)" class="chap-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">4. Admin Triage</button>
+            <button onclick="jumpTo(4)" class="chap-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">5. Field Work</button>
+            <button onclick="jumpTo(5)" class="chap-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">6. Proof Photo</button>
+            <button onclick="jumpTo(6)" class="chap-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">7. Sign-off</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Script Outline & Presentation Guide -->
+    <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-base text-white flex items-center gap-2">
+          <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Viva Evaluation Video Script & Spoken Points
+        </h3>
+        <span class="text-xs text-slate-400">Total Demonstration Time: ~2.5 Minutes</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+          <div class="text-teal-400 font-bold mb-1 uppercase tracking-wider text-[11px]">Part 1: Intake & Geolocation (0:00 - 0:45)</div>
+          <p class="text-slate-300 leading-relaxed">
+            "Meet Patel demonstrates citizen filing. GPS coordinates are fetched directly from the browser's HTML5 API, eliminating ambiguous addresses. The citizen attaches a photo and submits, receiving ticket CIV-2026-0001."
+          </p>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+          <div class="text-blue-400 font-bold mb-1 uppercase tracking-wider text-[11px]">Part 2: Administrative Triage (0:45 - 1:30)</div>
+          <p class="text-slate-300 leading-relaxed">
+            "Aditya Jadeja switches to the Admin Command Center using the 1-click login. He highlights the Recharts analytics, filters by 'Road Damage', flags priority as 'Urgent', and allocates the task to Officer Ramesh Kumar."
+          </p>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+          <div class="text-emerald-400 font-bold mb-1 uppercase tracking-wider text-[11px]">Part 3: Proof & Verification (1:30 - 2:20)</div>
+          <p class="text-slate-300 leading-relaxed">
+            "Staff moves ticket to 'In Progress', completes repair, and uploads the mandatory completion photo. Finally, the citizen inspects the photo, gives 5 stars, and officially marks the complaint CLOSED."
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800 bg-slate-950 px-6 py-4 text-center text-xs text-slate-500">
+    CivicPulse Public Complaint & Civic Issue Tracking System • Pandit Deendayal Energy University (PDEU) • 2026
+  </footer>
+
+  <script>
+    const scenes = [
+      {
+        title: "Portal Landing & Real-time Municipal Metrics",
+        time: "00:00",
+        duration: 20,
+        narration: "\"Here is the CivicPulse landing portal. Notice the live municipal statistics counter showing 9 total complaints across 5 departments, the quick tracking ID lookup bar, and the 4 core civic categories.\"",
+        render: `
+          <div class="h-full bg-slate-900 p-6 flex flex-col justify-between text-white">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded bg-blue-600 flex items-center justify-center font-bold text-xs">CP</div>
+                <span class="font-extrabold text-sm">CivicPulse • Municipal Corporation Portal</span>
+              </div>
+              <div class="flex items-center gap-3 text-xs">
+                <span class="text-slate-400">Home</span>
+                <span class="text-slate-400">Categories</span>
+                <span class="px-3 py-1 rounded bg-blue-600 text-white font-bold">Sign In</span>
+              </div>
+            </div>
+            <div class="my-auto max-w-xl">
+              <span class="text-[10px] font-bold uppercase text-teal-400 tracking-wider bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/30">PDEU Municipal Governance Portal</span>
+              <h2 class="text-2xl font-black mt-2 leading-tight">Digitalizing Civic Reporting for <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">Transparent Governance</span></h2>
+              <p class="text-xs text-slate-300 mt-2">Report potholes, sanitation lapses, broken streetlights, and drainage outages directly to municipal authorities.</p>
+              <div class="mt-4 flex gap-2">
+                <div class="bg-slate-800 px-3 py-2 rounded-lg text-xs text-slate-400 flex-1 border border-slate-700">Enter Ticket ID: CIV-2026-0001</div>
+                <div class="bg-teal-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs">Track Ticket →</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 gap-3 pt-3 border-t border-slate-800 text-center">
+              <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
+                <div class="text-lg font-black text-white">9</div>
+                <div class="text-[10px] text-slate-400 uppercase font-semibold">Total Logged</div>
+              </div>
+              <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
+                <div class="text-lg font-black text-amber-400">2</div>
+                <div class="text-[10px] text-slate-400 uppercase font-semibold">Pending Review</div>
+              </div>
+              <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
+                <div class="text-lg font-black text-blue-400">3</div>
+                <div class="text-[10px] text-slate-400 uppercase font-semibold">In Progress</div>
+              </div>
+              <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
+                <div class="text-lg font-black text-emerald-400">4</div>
+                <div class="text-[10px] text-slate-400 uppercase font-semibold">Resolved/Closed</div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Citizen Grievance Submission with HTML5 GPS Geotagging",
+        time: "00:20",
+        duration: 25,
+        narration: "\"The citizen logs in and accesses the filing desk. Clicking 'Use Current GPS Location' leverages the browser's Geolocation API to instantly capture latitude 23.1557 and longitude 72.6669 near PDEU, attaching a photo of the hazard.\"",
+        render: `
+          <div class="h-full bg-slate-900 p-6 flex flex-col justify-between text-white">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h3 class="font-bold text-sm text-white">Citizen Filing Desk • Submit Grievance</h3>
+              <span class="text-xs text-teal-400 font-mono">Meet Patel (Citizen)</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4 my-auto">
+              <div class="space-y-3">
+                <div>
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">Title</div>
+                  <div class="bg-slate-800 p-2 rounded text-xs text-white border border-slate-700">Deep Pothole on Main Boulevard</div>
+                </div>
+                <div>
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">Category</div>
+                  <div class="bg-slate-800 p-2 rounded text-xs text-white border border-slate-700">Road Damage & Potholes</div>
+                </div>
+                <div>
+                  <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase mb-1">
+                    <span>Location & GPS</span>
+                    <span class="text-teal-400 bg-teal-500/20 px-2 py-0.5 rounded font-mono">GPS Locked: 23.1557° N, 72.6669° E</span>
+                  </div>
+                  <div class="bg-slate-800 p-2 rounded text-xs text-white border border-slate-700">PDEU Knowledge Corridor, Kudasan, Gandhinagar</div>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <div>
+                  <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Photo Evidence</div>
+                  <div class="border-2 border-dashed border-teal-500/40 bg-teal-500/5 rounded-lg p-3 text-center">
+                    <img src="http://localhost:5000/uploads/pothole_issue.jpg" class="w-full h-24 object-cover rounded shadow" />
+                    <span class="text-[10px] text-teal-300 font-semibold mt-1 block">pothole_evidence.jpg (1.8 MB)</span>
+                  </div>
+                </div>
+                <div class="pt-2">
+                  <div class="w-full py-2 bg-gradient-to-r from-blue-600 to-teal-500 rounded text-center text-xs font-bold shadow text-white">
+                    Submit Grievance Ticket →
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Automated Ticket Ingestion & Live Timeline Progression",
+        time: "00:45",
+        duration: 20,
+        narration: "\"The backend validates the request, writes to the InnoDB database, and generates unique tracking ticket CIV-2026-0001 with an immutable initial audit log in the status_history table.\"",
+        render: `
+          <div class="h-full bg-slate-900 p-6 flex flex-col justify-between text-white">
+            <div class="max-w-md mx-auto my-auto text-center bg-slate-950 p-6 rounded-2xl border border-teal-500/30 shadow-2xl">
+              <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-2 text-xl font-bold">✓</div>
+              <h3 class="text-lg font-bold text-white">Grievance Ticket Generated!</h3>
+              <div class="my-3 p-3 bg-slate-900 rounded-xl border border-slate-800">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Tracking Number</span>
+                <div class="text-2xl font-black text-teal-400 mono">CIV-2026-0001</div>
+              </div>
+              <div class="flex justify-between items-center text-[10px] text-slate-400 pt-2 border-t border-slate-800">
+                <span>Timestamp: 18 Nov 2026, 17:49</span>
+                <span class="text-amber-400 font-bold uppercase bg-amber-500/10 px-2 py-0.5 rounded">Stage: SUBMITTED</span>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Municipal Admin Triage & Departmental Task Allocation",
+        time: "01:05",
+        duration: 25,
+        narration: "\"The administrator logs into the Command Center. With real-time Recharts analytics and triage filters, the admin sets Priority to 'Urgent', routes the ticket to 'Road Maintenance', and dispatches Officer Ramesh Kumar.\"",
+        render: `
+          <div class="h-full bg-slate-900 p-6 flex flex-col justify-between text-white">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h3 class="font-bold text-sm text-white">Admin Command Center • Triage Queue</h3>
+              <span class="text-xs text-blue-400 font-mono">Municipal Admin (admin@civic.gov)</span>
+            </div>
+            <div class="grid grid-cols-3 gap-3 my-auto">
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Ticket Ingestion Stats</div>
+                <div class="space-y-1.5 text-xs">
+                  <div class="flex justify-between"><span>Road Maintenance:</span><span class="font-bold text-blue-400">3</span></div>
+                  <div class="flex justify-between"><span>Sanitation:</span><span class="font-bold text-teal-400">2</span></div>
+                  <div class="flex justify-between"><span>Water & Drainage:</span><span class="font-bold text-cyan-400">2</span></div>
+                  <div class="flex justify-between"><span>Electrical:</span><span class="font-bold text-amber-400">2</span></div>
+                </div>
+              </div>
+              <div class="col-span-2 bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="font-bold text-teal-400">Triage Modal: CIV-2026-0001</span>
+                  <span class="bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded text-[10px] font-bold">Priority: Urgent</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block">Department</span>
+                    <span class="font-bold text-slate-200">Road Maintenance</span>
+                  </div>
+                  <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block">Assigned Staff</span>
+                    <span class="font-bold text-amber-300">Ramesh Kumar (Staff)</span>
+                  </div>
+                </div>
+                <div class="text-[11px] text-slate-400 italic bg-slate-900 p-2 rounded border border-slate-800">
+                  "Verified photo proof. Asphalt cold-mix roller dispatched to site."
+                </div>
+                <div class="text-right">
+                  <span class="px-3 py-1 bg-blue-600 rounded text-xs font-bold text-white">Dispatched to Staff ✓</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Field Staff Task Queue & Active Repair (IN PROGRESS)",
+        time: "01:30",
+        duration: 20,
+        narration: "\"Officer Ramesh Kumar views his mobile-responsive work queue on site. He clicks 'Start Work', changing the status to IN PROGRESS, alerting the citizen that crew is actively repairing the pothole.\"",
+        render: `
+          <div class="h-full bg-slate-900 p-6 flex flex-col justify-between text-white">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h3 class="font-bold text-sm text-white">Field Operations Desk • Ground Queue</h3>
+              <span class="text-xs text-amber-400 font-mono">Officer Ramesh Kumar (Roads)</span>
+            </div>
+            <div class="max-w-xl mx-auto my-auto bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 w-full">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-mono font-bold text-blue-400">CIV-2026-0001</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Status: IN PROGRESS</span>
+              </div>
+              <h4 class="font-bold text-sm text-white">Deep Pothole on Main Boulevard</h4>
+              <p class="text-xs text-slate-400">Location: PDEU Knowledge Corridor, Kudasan, Gandhinagar</p>
+              <div class="p-2.5 bg-slate-900 rounded border border-slate-800 text-xs text-slate-300">
+                Log: Field crew arrived on site with steam roller and bitumen compound.
+              </div>
+              <div class="pt-2 flex justify-end gap-2">
+                <span class="px-3 py-1.5 rounded bg-emerald-600 text-white font-bold text-xs">Next: Upload Proof Photo →</span>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Mandatory Proof-of-Work Completion Photo Upload",
+        time: "01:50",
+        duration: 20,
+        narration: "\"The repair is complete. Unlike traditional systems where officers simply close tickets without evidence, CivicPulse requires Ramesh to upload a photo of the completed smooth asphalt before the issue can transition to RESOLVED.\"",
+        render: `
+          <div class="h-full bg-slate-900 p-6 flex flex-col justify-between text-white">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h3 class="font-bold text-sm text-white">Proof-of-Work Resolution Submission</h3>
+              <span class="text-xs text-emerald-400 font-mono">Status Transition: RESOLVED</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4 my-auto max-w-xl mx-auto">
+              <div class="border-2 border-dashed border-emerald-500/40 bg-emerald-500/5 rounded-xl p-3 text-center">
+                <img src="http://localhost:5000/uploads/pothole_resolved.jpg" class="w-full h-32 object-cover rounded shadow" />
+                <span class="text-[10px] text-emerald-300 font-bold mt-1 block">pothole_repaired_proof.jpg</span>
+              </div>
+              <div class="space-y-2 text-xs flex flex-col justify-between">
+                <div>
+                  <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Repair Remarks</div>
+                  <div class="bg-slate-800 p-2 rounded text-slate-200 border border-slate-700 text-[11px] leading-relaxed">
+                    "Asphalt cold-mix patched and steam-rolled. Road surface restored to smooth grade."
+                  </div>
+                </div>
+                <div class="w-full py-2 bg-emerald-600 rounded text-center text-xs font-bold text-white shadow">
+                  Submit Proof & Mark Resolved ✓
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Citizen Inspection, 5-Star Rating & Ticket Sign-Off (CLOSED)",
+        time: "02:10",
+        duration: 25,
+        narration: "\"The citizen receives an alert, inspects the repair proof photo, awards a 5-star rating with feedback, and signs off. The ticket lifecycle is officially marked CLOSED with complete bidirectional transparency.\"",
+        render: `
+          <div class="h-full bg-slate-900 p-6 flex flex-col justify-between text-white">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h3 class="font-bold text-sm text-white">Citizen Verification & Quality Sign-Off</h3>
+              <span class="text-xs text-slate-400 font-mono">Final Lifecycle Stage: CLOSED</span>
+            </div>
+            <div class="max-w-md mx-auto my-auto bg-slate-950 p-5 rounded-xl border border-emerald-500/40 space-y-3 text-center">
+              <div class="flex justify-center text-amber-400 text-xl tracking-widest">
+                ★★★★★
+              </div>
+              <h4 class="font-bold text-sm text-white">Resolution Quality Verified by Meet Patel</h4>
+              <p class="text-xs text-slate-300 italic bg-slate-900 p-2.5 rounded border border-slate-800">
+                "Swift turnaround within 24 hours. Pothole leveled seamlessly. Great municipal work!"
+              </p>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
+                ✓ Full Audit Trail Recorded (5 Events)
+              </div>
+            </div>
+          </div>
+        `
+      }
+    ];
+
+    let currentScene = 0;
+    let isPlaying = false;
+    let playInterval = null;
+    let playbackSpeed = 1;
+    let sceneSeconds = 0;
+
+    function renderScene(idx) {
+      currentScene = idx;
+      const s = scenes[idx];
+      document.getElementById('scene-num').innerText = idx + 1;
+      document.getElementById('scene-title').innerText = s.title;
+      document.getElementById('narration-text').innerText = s.narration;
+      document.getElementById('video-frame').innerHTML = s.render;
+      document.getElementById('playback-time').innerText = `${s.time} / 02:25`;
+
+      // Update seek bar
+      const pct = ((idx + 1) / scenes.length) * 100;
+      document.getElementById('seek-progress').style.width = pct + '%';
+
+      // Update chapter buttons
+      const btns = document.querySelectorAll('.chap-btn');
+      btns.forEach((b, i) => {
+        if (i === idx) {
+          b.className = "chap-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-teal-500/20 text-teal-300 border border-teal-500/40";
+        } else {
+          b.className = "chap-btn px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-400 hover:text-slate-200";
+        }
+      });
+    }
+
+    function togglePlay() {
+      if (isPlaying) {
+        pause();
+      } else {
+        play();
+      }
+    }
+
+    function play() {
+      isPlaying = true;
+      document.getElementById('play-icon').innerText = '⏸';
+      document.getElementById('play-text').innerText = 'Pause';
+      
+      clearInterval(playInterval);
+      playInterval = setInterval(() => {
+        sceneSeconds += 1;
+        if (sceneSeconds >= (scenes[currentScene].duration / playbackSpeed)) {
+          sceneSeconds = 0;
+          if (currentScene < scenes.length - 1) {
+            renderScene(currentScene + 1);
+          } else {
+            pause();
+            currentScene = 0;
+            renderScene(0);
+          }
+        }
+      }, 1000);
+    }
+
+    function pause() {
+      isPlaying = false;
+      clearInterval(playInterval);
+      document.getElementById('play-icon').innerText = '▶';
+      document.getElementById('play-text').innerText = 'Auto Play';
+    }
+
+    function nextScene() {
+      sceneSeconds = 0;
+      if (currentScene < scenes.length - 1) {
+        renderScene(currentScene + 1);
+      } else {
+        renderScene(0);
+      }
+    }
+
+    function prevScene() {
+      sceneSeconds = 0;
+      if (currentScene > 0) {
+        renderScene(currentScene - 1);
+      } else {
+        renderScene(scenes.length - 1);
+      }
+    }
+
+    function jumpTo(idx) {
+      sceneSeconds = 0;
+      renderScene(idx);
+    }
+
+    function setSpeed(spd) {
+      playbackSpeed = spd;
+      ['spd-1', 'spd-15', 'spd-2'].forEach(id => {
+        document.getElementById(id).className = "px-2 py-0.5 rounded font-bold text-slate-400 hover:text-white";
+      });
+      const activeId = spd === 1 ? 'spd-1' : spd === 1.5 ? 'spd-15' : 'spd-2';
+      document.getElementById(activeId).className = "px-2 py-0.5 rounded font-bold bg-slate-700 text-teal-300";
+      if (isPlaying) {
+        play(); // restart interval with new speed
+      }
+    }
+
+    function handleSeek(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = clickX / rect.width;
+      const targetIdx = Math.min(scenes.length - 1, Math.floor(pct * scenes.length));
+      jumpTo(targetIdx);
+    }
+
+    // Initialize
+    renderScene(0);
+  </script>
+</body>
+</html>
