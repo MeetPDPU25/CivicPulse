@@ -83,7 +83,7 @@ export default function LandingPage() {
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30 mb-6">
             <Building2 className="w-3.5 h-3.5" />
-            <span>PDEU Municipal Corporation Digital Portal</span>
+            <span>Municipal Grievance Redressal Portal</span>
           </div>
 
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">

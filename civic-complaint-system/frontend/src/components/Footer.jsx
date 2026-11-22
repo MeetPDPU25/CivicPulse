@@ -1,5 +1,6 @@
 import React from 'react';
-import { Shield, MapPin, Award, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Shield, PhoneCall, Mail, MapPin } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -7,53 +8,76 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 pb-8 border-b border-slate-800">
           
-          {/* Col 1: System Info */}
+          {/* Col 1: Brand & Purpose */}
           <div>
-            <div className="flex items-center gap-2 text-white font-bold text-sm mb-2">
-              <Shield className="w-5 h-5 text-blue-400" />
-              <span>Public Complaint & Civic Issue Tracking System</span>
+            <div className="flex items-center gap-2.5 text-white font-bold text-base mb-3">
+              <div className="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-400 border border-teal-500/30 flex items-center justify-center">
+                <Shield className="w-4 h-4" />
+              </div>
+              <span>CivicPulse</span>
             </div>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              A transparent 3-tier municipal governance portal bridging citizens, administrative triage officers, and ground field crews for rapid civic grievance resolution.
+            <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
+              Integrated municipal grievance redressal portal. Empowering citizens to report, track, and verify public infrastructure and civic maintenance in real time.
             </p>
           </div>
 
-          {/* Col 2: Academic Info */}
+          {/* Col 2: Quick Links */}
           <div>
-            <div className="flex items-center gap-2 text-white font-bold text-sm mb-2">
-              <Award className="w-5 h-5 text-amber-400" />
-              <span>Minor Project Evaluation (2026)</span>
-            </div>
-            <p className="text-slate-300 font-medium">Department of Computer Science and Engineering</p>
-            <p className="text-slate-400">School of Technology, Pandit Deendayal Energy University (PDEU)</p>
-            <p className="mt-1 text-slate-400">
-              Developed by: <span className="text-slate-200 font-semibold">Meet Patel & Aditya Jadeja</span>
-            </p>
-          </div>
-
-          {/* Col 3: Key Features */}
-          <div>
-            <div className="flex items-center gap-2 text-white font-bold text-sm mb-2">
-              <CheckCircle className="w-5 h-5 text-emerald-400" />
-              <span>Demonstrated Capabilities</span>
-            </div>
-            <ul className="space-y-1 text-slate-400 text-xs">
-              <li>• HTML5 GPS Geo-tagging & Photo Proofs</li>
-              <li>• 6-Stage Accountability State Transitions</li>
-              <li>• Field Crew Proof-of-Work Verification</li>
-              <li>• Citizen 5-Star Rating & Quality Sign-Off</li>
+            <h4 className="text-white font-semibold text-sm mb-3">Quick Links</h4>
+            <ul className="space-y-2 text-slate-400 text-xs">
+              <li>
+                <Link to="/submit" className="hover:text-teal-400 transition-colors">
+                  Report a Civic Grievance
+                </Link>
+              </li>
+              <li>
+                <Link to="/track" className="hover:text-teal-400 transition-colors">
+                  Track Complaint Status
+                </Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-teal-400 transition-colors">
+                  Department Officer Sign In
+                </Link>
+              </li>
+              <li>
+                <Link to="/register" className="hover:text-teal-400 transition-colors">
+                  Citizen Portal Registration
+                </Link>
+              </li>
             </ul>
+          </div>
+
+          {/* Col 3: Municipal Helpdesk */}
+          <div>
+            <h4 className="text-white font-semibold text-sm mb-3">Municipal Grievance Helpline</h4>
+            <div className="space-y-2 text-slate-400 text-xs">
+              <div className="flex items-center gap-2">
+                <PhoneCall className="w-4 h-4 text-teal-400 shrink-0" />
+                <span>1800-233-0200 (Toll-Free 24x7)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-teal-400 shrink-0" />
+                <span>grievance@civicpulse.gov.in</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
+                <span>Municipal Corporation Headquarters, Gandhinagar, Gujarat</span>
+              </div>
+            </div>
           </div>
 
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between text-slate-500 gap-4">
-          <p>© 2026 CivicPulse Municipal Corporation. Built for Academic Demonstration.</p>
-          <div className="flex items-center gap-4">
-            <span className="inline-flex items-center gap-1 text-emerald-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              API & DB Operational (Port 5000 / MySQL)
-            </span>
+        {/* Bottom Copyright */}
+        <div className="flex flex-col sm:flex-row items-center justify-between text-slate-500 gap-3 text-xs">
+          <p>© 2026 CivicPulse — Municipal Corporation Public Grievance Portal. All rights reserved.</p>
+          <div className="flex items-center gap-4 text-slate-400">
+            <span className="hover:text-slate-300 transition-colors cursor-pointer">Privacy Policy</span>
+            <span>•</span>
+            <span className="hover:text-slate-300 transition-colors cursor-pointer">Terms of Service</span>
+            <span>•</span>
+            <span className="hover:text-slate-300 transition-colors cursor-pointer">Citizen Charter</span>
           </div>
         </div>
       </div>
