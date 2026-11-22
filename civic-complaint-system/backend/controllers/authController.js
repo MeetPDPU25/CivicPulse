@@ -11,6 +11,45 @@ exports.register = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Name, email, and password are required' });
     }
 
+    // Name validation: only letters and spaces allowed
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(name.trim()) || name.trim().length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name can only contain letters and spaces (minimum 2 characters)'
+      });
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address'
+      });
+    }
+
+    // Phone validation: numbers only (10 digits) if provided
+    if (phone && phone.trim()) {
+      const cleanPhone = phone.trim().replace(/[\s\-\+]/g, '');
+      const phoneDigits = cleanPhone.startsWith('91') && cleanPhone.length === 12 ? cleanPhone.slice(2) : cleanPhone;
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(phoneDigits)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Phone number can only contain numbers (10 digits)'
+        });
+      }
+    }
+
+    // Password validation: minimum 6 chars
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long'
+      });
+    }
+
     const [existing] = await pool.query('SELECT user_id FROM users WHERE email = ?', [email]);
     if (existing.length > 0) {
       return res.status(400).json({ success: false, message: 'An account with this email already exists' });

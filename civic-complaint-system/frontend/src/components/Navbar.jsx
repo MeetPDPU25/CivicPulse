@@ -31,18 +31,22 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           
           {/* Logo & Brand */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-blue-700 to-teal-500 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-              <Shield className="w-6 h-6" />
+          <Link to="/" className="flex items-center gap-3.5 group py-1">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-teal-400 flex items-center justify-center text-white shadow-md shadow-blue-900/30 group-hover:scale-105 transition-all duration-200">
+              <Shield className="w-5 h-5" />
             </div>
-            <div>
-              <div className="font-extrabold text-lg tracking-tight flex items-center gap-1.5">
-                CivicPulse
-                <span className="text-[10px] uppercase font-bold bg-blue-500/30 text-blue-300 px-1.5 py-0.5 rounded border border-blue-400/30">
+            <div className="flex flex-col justify-center">
+              <div className="flex items-center gap-3">
+                <span className="font-extrabold text-xl tracking-tight text-white group-hover:text-teal-300 transition-colors">
+                  CivicPulse
+                </span>
+                <span className="text-[10px] tracking-wider uppercase font-bold bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-400/40 shadow-sm backdrop-blur-sm">
                   Gov Portal
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 -mt-0.5 hidden sm:block">Public Complaint & Civic Issue Tracking</p>
+              <p className="text-[11px] font-medium text-slate-400 hidden sm:block mt-0.5">
+                Public Complaint &amp; Civic Issue Tracking
+              </p>
             </div>
           </Link>
 
